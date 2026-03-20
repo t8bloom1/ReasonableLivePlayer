@@ -32,7 +32,9 @@ RLP listens for a MIDI note to know when to advance to the next song. Reason sen
 
 1. Install the [.NET 8.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) if you don't already have it.
 2. Install [LoopBe1](https://www.nerds.de/en/loopbe1.html) (or another virtual MIDI loopback driver).
-3. Download `ReasonableLivePlayer.exe` from the [Releases](https://github.com/t8bloom1/ReasonableLivePlayer/releases) page.
+3. Download `ReasonableLivePlayer.exe`:
+   - **Pre-built**: grab the latest from the [Releases](https://github.com/t8bloom1/ReasonableLivePlayer/releases) page (when available).
+   - **Build it yourself**: see [Building from Source](#building-from-source) below.
 4. Place it anywhere you like and run it — no installer needed.
 
 ## Quick Start
