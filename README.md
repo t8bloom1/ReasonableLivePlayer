@@ -96,13 +96,13 @@ git clone https://github.com/t8bloom1/ReasonableLivePlayer.git
 cd ReasonableLivePlayer
 
 # Build
-dotnet build ReasonLivePlayer/ReasonLivePlayer.csproj
+dotnet build ReasonableLivePlayer/ReasonableLivePlayer.csproj
 
 # Run tests
-dotnet test ReasonLivePlayer.Tests/ReasonLivePlayer.Tests.csproj
+dotnet test ReasonableLivePlayer.Tests/ReasonableLivePlayer.Tests.csproj
 
 # Publish single-file executable
-dotnet publish ReasonLivePlayer/ReasonLivePlayer.csproj -c Release -r win-x64 -o dist
+dotnet publish ReasonableLivePlayer/ReasonableLivePlayer.csproj -c Release -r win-x64 -o dist
 ```
 
 The published executable will be at `dist/ReasonableLivePlayer.exe`.
