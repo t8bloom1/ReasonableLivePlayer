@@ -2,6 +2,8 @@
 
 Reasonable Live Player automates live set playback in [Reason](https://www.reasonstudios.com/). It opens Reason song files in sequence and advances to the next song when a MIDI trigger note is received — hands-free transitions for live performance.
 
+> **Looking for macOS?** See [ReasonableLivePlayer-Mac](https://github.com/t8bloom1/ReasonableLivePlayer-Mac).
+
 ## Features
 
 - Build and save playlists of `.reason` / `.rns` song files
