@@ -30,8 +30,12 @@
                 • Drag and drop .reason files from Windows Explorer into the playlist.<LineBreak/>
                 • Reorder songs by dragging within the list.<LineBreak/>
                 • Click the indicator column next to a song while paused to select it as the next song to play.<LineBreak/>
+                • Double-click any song in the playlist to immediately jump to it (closes the current song first).<LineBreak/>
                 • Save and load playlists to quickly recall your set order.<LineBreak/>
+                • Double-click a .rlp file in Explorer to open it directly in RLP.<LineBreak/>
+                • Launch from command line with a playlist: rlp.exe c:\path\myplaylist.rlp<LineBreak/>
                 • Enable "Load last playlist on startup" in Settings to pick up where you left off.<LineBreak/>
+                • A command-line playlist always takes priority over the last-used playlist.<LineBreak/>
                 • Increase the transition delay in Settings if the next song fails to open
                   (especially when a background Reason file is loaded).
                 <LineBreak/><LineBreak/>

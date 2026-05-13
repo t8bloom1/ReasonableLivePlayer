@@ -176,6 +176,15 @@ public partial class MainWindow : Window
         }
     }
 
+    private void Playlist_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm) return;
+        var song = GetSongAtPoint(PlaylistBox, e.GetPosition(PlaylistBox));
+        if (song != null && vm.JumpToSongCommand.CanExecute(song))
+            vm.JumpToSongCommand.Execute(song);
+        e.Handled = true;
+    }
+
     private static Song? GetSongAtPoint(ListBox? list, Point pt)
     {
         if (list == null) return null;

@@ -1,8 +1,7 @@
 <Application x:Class="ReasonableLivePlayer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="clr-namespace:ReasonableLivePlayer.Converters"
-             StartupUri="MainWindow.xaml">
+             xmlns:converters="clr-namespace:ReasonableLivePlayer.Converters">
     <Application.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolVis"/>
         <converters:ActiveIndicatorConverter x:Key="ActiveIndicator"/>

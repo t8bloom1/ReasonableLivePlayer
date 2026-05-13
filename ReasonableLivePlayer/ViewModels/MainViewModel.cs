@@ -65,6 +65,7 @@ public class MainViewModel : INotifyPropertyChanged
     public RelayCommand LoadPlaylistCommand { get; }
     public RelayCommand OpenHelpCommand { get; }
     public RelayCommand SelectSongCommand { get; }
+    public RelayCommand JumpToSongCommand { get; }
 
     public MainViewModel()
     {
@@ -78,13 +79,40 @@ public class MainViewModel : INotifyPropertyChanged
             CommandManager.InvalidateRequerySuggested();
         };
 
+        // Listen for playlists sent from second instances
+        App.PlaylistReceived += OnPlaylistReceivedFromOtherInstance;
+
         var settings = SettingsStore.Load();
         _transitionDelaySec = settings.TransitionDelaySec;
         AlwaysOnTop = settings.AlwaysOnTop;
         if (!string.IsNullOrEmpty(settings.MidiDeviceName))
             _midiListener.Connect(settings.MidiDeviceName, settings.MidiChannel - 1, settings.EndNoteNumber);
 
-        if (settings.LoadLastPlaylist && !string.IsNullOrEmpty(settings.LastPlaylistPath)
+        var startupPath = App.StartupPlaylistPath;
+        if (!string.IsNullOrEmpty(startupPath) && startupPath.EndsWith(".rlp", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!System.IO.File.Exists(startupPath))
+            {
+                MessageBox.Show($"Playlist file not found:\n{startupPath}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else
+            {
+                try
+                {
+                    var paths = PlaylistFileService.Load(startupPath);
+                    foreach (var p in paths)
+                        Songs.Add(new Song { FilePath = p });
+                    StatusText = $"Loaded {Songs.Count} songs";
+                    PlaylistDirty = false;
+                    SettingsStore.Save(settings with { LastPlaylistPath = startupPath });
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show($"Failed to parse playlist file:\n{startupPath}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+        else if (settings.LoadLastPlaylist && !string.IsNullOrEmpty(settings.LastPlaylistPath)
             && System.IO.File.Exists(settings.LastPlaylistPath))
         {
             var paths = PlaylistFileService.Load(settings.LastPlaylistPath);
@@ -179,6 +207,26 @@ public class MainViewModel : INotifyPropertyChanged
                 }
             }
         }, _ => !IsPlaylistActive);
+
+        JumpToSongCommand = new RelayCommand(async p =>
+        {
+            if (p is not Song target) return;
+            var targetIdx = Songs.IndexOf(target);
+            if (targetIdx < 0) return;
+            if (target.IsActive) return;
+
+            // Close current song if one is active
+            if (_currentIndex >= 0 && _currentIndex < Songs.Count)
+                _bridge.CloseSong(Songs[_currentIndex].FilePath);
+
+            _currentIndex = targetIdx;
+            SetActiveSong(targetIdx);
+            IsPlaylistActive = true;
+            StatusText = $"Opening: {target.DisplayName}";
+            await Task.Delay(_transitionDelaySec * 1000);
+            await _bridge.OpenSongAsync(target.FilePath);
+            StatusText = $"Playing: {target.DisplayName}";
+        }, _ => Songs.Count > 0);
     }
 
     public bool PromptSaveIfDirty()
@@ -201,7 +249,43 @@ public class MainViewModel : INotifyPropertyChanged
     /// </summary>
     public void Cleanup()
     {
+        App.PlaylistReceived -= OnPlaylistReceivedFromOtherInstance;
         _midiListener.Dispose();
+    }
+
+    private void OnPlaylistReceivedFromOtherInstance(string path)
+    {
+        if (!path.EndsWith(".rlp", StringComparison.OrdinalIgnoreCase)) return;
+        if (!System.IO.File.Exists(path)) return;
+
+        try
+        {
+            var paths = PlaylistFileService.Load(path);
+            Songs.Clear();
+            _currentIndex = -1;
+            IsPlaylistActive = false;
+            foreach (var p in paths)
+                Songs.Add(new Song { FilePath = p });
+            StatusText = $"Loaded {Songs.Count} songs";
+            PlaylistDirty = false;
+            var cur = SettingsStore.Load();
+            SettingsStore.Save(cur with { LastPlaylistPath = path });
+
+            // Bring window to foreground
+            var win = Application.Current.MainWindow;
+            if (win != null)
+            {
+                if (win.WindowState == WindowState.Minimized)
+                    win.WindowState = WindowState.Normal;
+                win.Activate();
+                win.Topmost = true;
+                win.Topmost = AlwaysOnTop;
+            }
+        }
+        catch (Exception)
+        {
+            MessageBox.Show($"Failed to parse playlist file:\n{path}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void SavePlaylist()

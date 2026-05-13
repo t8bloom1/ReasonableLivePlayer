@@ -16,7 +16,7 @@ public partial class HelpDialog : Window
         var version = asm.GetName().Version;
         VersionRun.Text = $"Version: {version?.Major}.{version?.Minor}.{version?.Build}";
 
-        var exePath = Path.Combine(AppContext.BaseDirectory, "ReasonableLivePlayer.exe");
+        var exePath = Path.Combine(AppContext.BaseDirectory, "rlp.exe");
         var buildDate = System.IO.File.Exists(exePath)
             ? System.IO.File.GetLastWriteTime(exePath)
             : DateTime.Now;
